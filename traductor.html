@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traductor</title>
+    
+</head>
+<body>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    width: 500px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.translator {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.language-select {
+    display: flex;
+    justify-content: space-between;
+}
+
+label {
+    font-weight: bold;
+}
+
+select {
+    padding: 5px;
+    font-size: 14px;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    resize: none;
+}
+
+#translate-btn {
+    padding: 10px;
+    font-size: 16px;
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#translate-btn:hover {
+    background-color: #357ae8;
+}
+
+    </style>
+    <div class="container">
+        <h1>Traductor</h1>
+        <div class="translator">
+            <div class="language-select">
+                <label for="from-lang">De:</label>
+                <select id="from-lang">
+                    <!-- Lista de idiomas de origen -->
+                </select>
+            </div>
+            <div class="language-select">
+                <label for="to-lang">A:</label>
+                <select id="to-lang">
+                    <!-- Lista de idiomas de destino -->
+                </select>
+            </div>
+            <textarea id="input-text" placeholder="Introduce el texto a traducir..."></textarea>
+            <button id="translate-btn">Traducir</button>
+            <textarea id="output-text" readonly placeholder="La traducción aparecerá aquí..."></textarea>
+        </div>
+    </div>
+    <script>
+     const languages = {
+    "auto": "Detectar idioma",
+    "en": "Inglés",
+    "es": "Español",
+    "fr": "Francés",
+    "de": "Alemán",
+    "it": "Italiano",
+    "pt": "Portugués",
+    // Añade más idiomas si es necesario
+};
+
+// Añadir idiomas al selector
+const fromLangSelect = document.getElementById('from-lang');
+const toLangSelect = document.getElementById('to-lang');
+
+Object.entries(languages).forEach(([code, name]) => {
+    const optionFrom = document.createElement('option');
+    optionFrom.value = code;
+    optionFrom.textContent = name;
+    fromLangSelect.appendChild(optionFrom);
+
+    const optionTo = document.createElement('option');
+    optionTo.value = code;
+    optionTo.textContent = name;
+    toLangSelect.appendChild(optionTo);
+});
+
+fromLangSelect.value = "auto";  // Detectar idioma por defecto
+toLangSelect.value = "en";      // Inglés como idioma de destino por defecto
+
+// Función para realizar la traducción
+document.getElementById('translate-btn').addEventListener('click', () => {
+    const text = document.getElementById('input-text').value;
+    const fromLang = document.getElementById('from-lang').value;
+    const toLang = document.getElementById('to-lang').value;
+
+    if (text.trim() === "") {
+        alert("Por favor, introduce un texto para traducir.");
+        return;
+    }
+
+    const apiUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('output-text').value = data[0][0][0];
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Hubo un error con la traducción. Por favor, intenta nuevamente.");
+        });
+});
+
+    </script>
+</body>
+</html>
